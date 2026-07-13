@@ -25,6 +25,8 @@ jobs:
       # ✅ PASSO 1: Já está pronto — Baixar o código
       - name: 📥 Checkout do Código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # ✅ PASSO 2: Já está pronto — Build.
       - name: ⚙️ Build
@@ -70,9 +72,15 @@ jobs:
         #  semgrep scan --config auto --error src/
         #------------------
         run: |
-          pip install semgrep
-          semgrep ci --config p/default --config p/security-audit --config p/owasp-top-ten --config p/cwe-top-25 --sarif --output semgrep-results.sarif src/
-
+            pip install semgrep
+            
+            semgrep ci \
+              --config p/default \
+              --config p/security-audit \
+              --config p/owasp-top-ten \
+              --config p/cwe-top-25 \
+              --sarif --output semgrep-results.sarif
+              
       # ✅ PASSO 5: IMPLEMENTE AQUI — SCA com Grype
       # Dica: instale com "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
       # e rode "grype dir:. --fail-on medium"
