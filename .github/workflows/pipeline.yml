@@ -65,11 +65,21 @@ jobs:
         #run: echo "TODO - implemente o SAST com Semgrep aqui"
         # SUBSTITUA pelo comando real: pip install semgrep && semgrep scan --config auto --error src/
         #------------------
-        run: |
-          pip install semgrep
-          semgrep scan --config auto --error src/
+        #run: |
+        #  pip install semgrep
+        #  semgrep scan --config auto --error src/
         #------------------
-        
+        run: |
+            pip install semgrep
+            semgrep ci \
+              --config p/default \
+              --config p/security-audit \
+              --config p/owasp-top-ten \
+              --config p/cwe-top-25 \
+              --error \
+              --sarif --output semgrep-results.sarif \
+              src/
+
       # ✅ PASSO 5: IMPLEMENTE AQUI — SCA com Grype
       # Dica: instale com "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
       # e rode "grype dir:. --fail-on medium"
