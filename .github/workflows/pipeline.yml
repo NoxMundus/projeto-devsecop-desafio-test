@@ -80,8 +80,8 @@ jobs:
               --config p/security-audit \
               --config p/owasp-top-ten \
               --config p/cwe-top-25 \
-              --sarif --output semgrep-results.sarif
-            SCAN_EXIT=$?
+              --sarif --output semgrep-results.sarif || SCAN_EXIT=$?
+            SCAN_EXIT=${SCAN_EXIT:-0}
 
             echo ""
             echo "📋 Findings detalhados:"
@@ -97,11 +97,9 @@ jobs:
                     path = loc.get('artifactLocation', {}).get('uri', '?')
                     line = loc.get('region', {}).get('startLine', '?')
                     print(f'[{rule}] {path}:{line}')
-                    print(f'    {msg}')
-            "
-            
-                        echo ""
-                        exit $SCAN_EXIT    
+                    print(f'    {msg}')"
+            echo ""
+            exit $SCAN_EXIT
               
       # ✅ PASSO 5: IMPLEMENTE AQUI — SCA com Grype
       # Dica: instale com "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
