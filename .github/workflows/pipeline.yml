@@ -74,25 +74,34 @@ jobs:
         run: |
             pip install semgrep
 
-            echo "🔍 Running Semgrep scan (SARIF)..."
+            echo "🔍 Running Semgrep scan..."
             semgrep ci \
               --config p/default \
               --config p/security-audit \
               --config p/owasp-top-ten \
               --config p/cwe-top-25 \
-              --sarif --output semgrep-results.sarif || true
-
-            echo "📋 Findings (texto legível):"
-            semgrep scan \
-              --config p/default \
-              --config p/security-audit \
-              --config p/owasp-top-ten \
-              --config p/cwe-top-25 \
-              --text src/
+              --sarif --output semgrep-results.sarif
             SCAN_EXIT=$?
 
-            echo "❌ Falhando o step por causa dos findings acima"
-            exit $SCAN_EXIT
+            echo ""
+            echo "📋 Findings detalhados:"
+            python3 -c "
+            import json
+            with open('semgrep-results.sarif') as f:
+                data = json.load(f)
+            for run in data.get('runs', []):
+                for r in run.get('results', []):
+                    rule = r.get('ruleId', '?')
+                    msg = r.get('message', {}).get('text', '').replace(chr(10), ' ')
+                    loc = r.get('locations', [{}])[0].get('physicalLocation', {})
+                    path = loc.get('artifactLocation', {}).get('uri', '?')
+                    line = loc.get('region', {}).get('startLine', '?')
+                    print(f'[{rule}] {path}:{line}')
+                    print(f'    {msg}')
+            "
+            
+                        echo ""
+                        exit $SCAN_EXIT    
               
       # ✅ PASSO 5: IMPLEMENTE AQUI — SCA com Grype
       # Dica: instale com "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
