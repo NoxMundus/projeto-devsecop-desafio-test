@@ -74,13 +74,13 @@ jobs:
         run: |
             pip install semgrep
 
-            echo "🔍 Running Semgrep scan..."
+            echo "🔍 Running Semgrep scan (SARIF)..."
             semgrep ci \
               --config p/default \
               --config p/security-audit \
               --config p/owasp-top-ten \
               --config p/cwe-top-25 \
-              --sarif --output semgrep-results.sarif
+              --sarif --output semgrep-results.sarif || true
 
             echo "📋 Findings (texto legível):"
             semgrep scan \
@@ -89,6 +89,10 @@ jobs:
               --config p/owasp-top-ten \
               --config p/cwe-top-25 \
               --text src/
+            SCAN_EXIT=$?
+
+            echo "❌ Falhando o step por causa dos findings acima"
+            exit $SCAN_EXIT
               
       # ✅ PASSO 5: IMPLEMENTE AQUI — SCA com Grype
       # Dica: instale com "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin"
